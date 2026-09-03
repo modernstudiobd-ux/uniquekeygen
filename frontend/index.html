@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Unique Code Generator</title>
+<meta name="description" content="Generate globally unique codes backed by a real database — never a duplicate, anywhere." />
+<meta name="theme-color" content="#14171C" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div id="offline-banner" class="offline-banner" hidden>
+  You're offline. Connect to the internet to generate globally unique codes.
+</div>
+
+<header class="app-header">
+  <div class="app-header__inner">
+    <h1 class="app-title">Unique Code Generator</h1>
+    <p class="app-subtitle">Every code is reserved once, for good — enforced by the registry, not your browser.</p>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- SETTINGS -->
+  <section class="panel settings" aria-label="Generator settings">
+    <h2 class="panel__title">Generator settings</h2>
+
+    <div class="field">
+      <label for="quantity">Number of codes</label>
+      <input type="number" id="quantity" min="1" step="1" value="10" inputmode="numeric" />
+    </div>
+
+    <div class="field">
+      <label for="length">Code length</label>
+      <input type="number" id="length" min="1" step="1" value="8" inputmode="numeric" />
+      <p class="field__hint">Used when no custom pattern is set below.</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="prefix">Prefix</label>
+        <input type="text" id="prefix" placeholder="e.g. KMP" />
+      </div>
+      <div class="field">
+        <label for="postfix">Postfix</label>
+        <input type="text" id="postfix" placeholder="e.g. 2026" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="pattern">Pattern <span class="field__optional">(optional)</span></label>
+      <input type="text" id="pattern" placeholder="e.g. ####-####" />
+      <p class="field__hint"><code>#</code> = one random character. Everything else is kept exactly as typed. Overrides code length when set.</p>
+    </div>
+
+    <div class="field">
+      <label for="charset-preset">Characters to use</label>
+      <select id="charset-preset">
+        <option value="upperLowerNumbers">Uppercase + lowercase + numbers</option>
+        <option value="upperNumbers">Uppercase + numbers</option>
+        <option value="lowerNumbers">Lowercase + numbers</option>
+        <option value="upper">Uppercase only</option>
+        <option value="lower">Lowercase only</option>
+        <option value="numbers">Numbers only</option>
+        <option value="custom">Custom</option>
+      </select>
+    </div>
+
+    <div class="field" id="custom-charset-field" hidden>
+      <label for="custom-charset">Custom characters</label>
+      <input type="text" id="custom-charset" placeholder="e.g. ABCXYZ789" />
+      <p class="field__hint">Duplicate characters are removed automatically.</p>
+    </div>
+
+    <div class="field field--checkbox">
+      <label>
+        <input type="checkbox" id="exclude-confusing" />
+        Exclude confusing characters (O, 0, I, 1, L)
+      </label>
+    </div>
+
+    <p class="capacity-note" id="capacity-note"></p>
+    <p class="error-banner" id="settings-error" role="alert" hidden></p>
+
+    <button class="btn btn--primary btn--generate" id="generate-btn" type="button">
+      Generate 10 Codes
+    </button>
+
+    <div class="progress" id="progress" hidden>
+      <div class="progress__bar"><div class="progress__fill" id="progress-fill"></div></div>
+      <p class="progress__label" id="progress-label">Generating unique codes…</p>
+    </div>
+  </section>
+
+  <!-- PREVIEW -->
+  <section class="panel preview" aria-label="Preview">
+    <h2 class="panel__title">Preview</h2>
+    <p class="panel__note">A sample only — never reserved in the registry.</p>
+    <div class="stamp">
+      <span class="stamp__code" id="preview-code">KMP4Q8a4</span>
+    </div>
+  </section>
+
+</main>
+
+<!-- RESULTS -->
+<section class="panel results" id="results-section" aria-label="Generated codes" hidden>
+  <div class="panel__header">
+    <h2 class="panel__title">Generated codes</h2>
+    <span class="results__count" id="results-count"></span>
+  </div>
+
+  <div class="toolbar">
+    <label class="toolbar__select-all">
+      <input type="checkbox" id="select-all-results" />
+      Select all
+    </label>
+    <div class="toolbar__actions">
+      <button class="btn btn--ghost" id="copy-selected-btn" type="button">Copy selected</button>
+      <button class="btn btn--ghost" id="copy-all-btn" type="button">Copy all</button>
+      <button class="btn btn--ghost" id="download-txt-btn" type="button">Download .txt</button>
+      <button class="btn btn--ghost" id="download-csv-btn" type="button">Download .csv</button>
+    </div>
+  </div>
+
+  <ul class="code-list" id="results-list"></ul>
+</section>
+
+<!-- HISTORY -->
+<section class="panel history" aria-label="Local history">
+  <div class="panel__header">
+    <h2 class="panel__title">History</h2>
+    <button class="btn btn--text" id="clear-history-btn" type="button">Clear local history</button>
+  </div>
+  <p class="panel__note">Stored on this device only. Clearing it does not release codes from the registry — they remain reserved.</p>
+
+  <input type="search" id="history-search" class="history__search" placeholder="Search history…" />
+
+  <div class="toolbar">
+    <label class="toolbar__select-all">
+      <input type="checkbox" id="select-all-history" />
+      Select all
+    </label>
+    <div class="toolbar__actions">
+      <button class="btn btn--ghost" id="copy-selected-history-btn" type="button">Copy selected</button>
+      <button class="btn btn--ghost" id="export-history-csv-btn" type="button">Export .csv</button>
+    </div>
+  </div>
+
+  <ul class="code-list" id="history-list"></ul>
+  <p class="empty-state" id="history-empty">No codes generated on this device yet.</p>
+</section>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+name = "unique-code-generator"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+# --- D1 binding -------------------------------------------------------
+# Create the database first with:
+#   wrangler d1 create unique-code-generator-db
+# then paste the returned database_id below.
+[[d1_databases]]
+binding = "DB"
+database_name = "unique-code-generator-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+# --- Environment variables ---------------------------------------------
+# ALLOWED_ORIGIN should be your GitHub Pages origin, e.g.
+# "https://yourusername.github.io". Avoid "*" — CORS should be scoped
+# to the actual frontend origin.
+[vars]
+ALLOWED_ORIGIN = "https://yourusername.github.io"
+MAX_QUANTITY_PER_REQUEST = "10000"
+MAX_CODE_LENGTH = "128"
+MAX_REQUESTS_PER_MINUTE = "30"
+MAX_CODES_PER_MINUTE = "20000"

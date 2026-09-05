@@ -17,7 +17,7 @@ migrations_dir = "migrations"
 # "https://yourusername.github.io". Avoid "*" — CORS should be scoped
 # to the actual frontend origin.
 [vars]
-ALLOWED_ORIGIN = "https://yourusername.github.io"
+ALLOWED_ORIGIN = "https://modernstudiobd-ux.github.io"
 MAX_QUANTITY_PER_REQUEST = "10000"
 MAX_CODE_LENGTH = "128"
 MAX_REQUESTS_PER_MINUTE = "30"

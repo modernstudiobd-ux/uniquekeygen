@@ -9,7 +9,7 @@ compatibility_date = "2026-08-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "unique-code-generator-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "806b7831-0d86-4c2d-9972-7ac39f434487"
 migrations_dir = "migrations"
 
 # --- Environment variables ---------------------------------------------

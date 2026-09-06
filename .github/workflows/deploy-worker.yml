@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: worker
-        run: npm ci
+        run: npm install
 
       - name: Apply D1 migrations
         working-directory: worker
